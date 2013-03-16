@@ -5,6 +5,10 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 /**
+ * Graphical user interface.
+ *
+ * <p>Creates a graphical user interface to interact with user.</p>
+ *
  * @author Pavel Trutman
  */
 public class GUI extends JFrame {
@@ -12,7 +16,9 @@ public class GUI extends JFrame {
   public GUI (){
     super("Sudoku");
 
-    //components
+    /**
+     * Components
+     */
     Container container;
     GridBagLayout bigGrid;
     GridBagLayout smallGrid;
@@ -22,7 +28,9 @@ public class GUI extends JFrame {
     JPanel[][] bigSquares;
     JPanel sud;
 
-    //menus
+    /*
+     * Menu items
+     */
     JMenuBar menuBar;
     JMenu gameMenu;
     JMenuItem exitGame;
@@ -41,6 +49,7 @@ public class GUI extends JFrame {
 
     int i, j;
 
+    //set border
     bord = new LineBorder(Color.BLACK, 1, false);
 
     //INIT WINDOW
@@ -107,7 +116,8 @@ public class GUI extends JFrame {
     setJMenuBar(menuBar);
 
 
-    //grid 3x3 init
+    //GRID 3x3 INIT
+    //size of grids
     int[] bigGridSize = {120, 120, 120};
     bigGrid = new GridBagLayout();
     bigGrid.columnWidths = bigGridSize;
@@ -115,7 +125,8 @@ public class GUI extends JFrame {
     bigGridCon = new GridBagConstraints();
     bigGridCon.fill = GridBagConstraints.BOTH;
 
-    //grid 9x9 init
+    //GRID 9x9 INIT
+    //size of grids
     int[] smallGridSize = {37, 37, 37};
     smallGrid = new GridBagLayout();
     smallGrid.columnWidths = smallGridSize;
@@ -124,17 +135,17 @@ public class GUI extends JFrame {
     smallGridCon.fill = GridBagConstraints.BOTH;
     smallGridCon.insets = new Insets(2, 2, 2, 2);
 
-    //wrap init
+    //WRAP INIT
     sud = new JPanel();
     sud.setLayout(bigGrid);
     sud.setBorder(bord);
 
-    //container init
+    //CONTAINER INIT
     container = getContentPane();
     container.setLayout(new GridBagLayout());
     container.add(sud);
 
-    //grid 3x3 generate
+    //GRID 3x3 GENERATE
     bigSquares = new JPanel[3][3];
     for(i = 0; i < 3; i++) {
       for(j = 0; j <3 ; j++) {
@@ -147,7 +158,7 @@ public class GUI extends JFrame {
       }
     }
 
-    //grid 9x9 generate
+    //GRID 9x9 GENERATE
     inputs = new JTextField[9][9];
     for(i = 0; i < 9; i++) {
       for(j = 0; j < 9; j++) {
@@ -171,6 +182,7 @@ public class GUI extends JFrame {
     inputs[5][6].setBackground(new Color(238, 238, 238));
     */
 
+    //PACK IT
     pack();
 
   }
