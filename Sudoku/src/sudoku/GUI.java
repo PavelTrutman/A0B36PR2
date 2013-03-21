@@ -1,6 +1,7 @@
 package sudoku;
 
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -11,8 +12,11 @@ import javax.swing.border.*;
  *
  * @author Pavel Trutman
  */
-public class GUI extends JFrame {
+public class GUI extends JFrame implements KeyListener {
 
+  /**
+   * Inits GUI.
+   */
   public GUI (){
     super("Sudoku");
 
@@ -53,12 +57,13 @@ public class GUI extends JFrame {
     bord = new LineBorder(Color.BLACK, 1, false);
 
     //INIT WINDOW
-    this.setSize(Dim = new Dimension(500, 500));
+    Dim = new Dimension(500, 500);
+    this.setSize(Dim);
     this.setMaximumSize(Dim);
     this.setMinimumSize(Dim);
+    this.setBounds(100, 100, 500, 500);
     this.setResizable(false);
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    this.setVisible(true);
 
     //MENUS
     menuBar = new JMenuBar();
@@ -170,6 +175,7 @@ public class GUI extends JFrame {
         inputs[i][j].setBorder(null);
         inputs[i][j].setHorizontalAlignment(JTextField.CENTER);
         inputs[i][j].setBackground(new Color(250, 250, 250));
+        inputs[i][j].addKeyListener(this);
         bigSquares[i/3][j/3].add(inputs[i][j], smallGridCon);
 
       }
@@ -182,8 +188,47 @@ public class GUI extends JFrame {
     inputs[5][6].setBackground(new Color(238, 238, 238));
     */
 
-    //PACK IT
+    //SET IT VISIBLE AND PACK IT
+    this.setVisible(true);
     pack();
 
+  }
+
+  /**
+   * Iplementing KeyListener methods.
+   */
+
+  @Override
+  public void keyTyped(KeyEvent key) {
+    //get the focused component
+    JTextField In = (JTextField) this.getMostRecentFocusOwner();
+    //clear input if Ctrl+v pressed
+    if(key.isControlDown()) {
+      In.setText("");
+    }
+    //get char from pressed key
+    char c = key.getKeyChar();
+    //only numbers 1-9
+    if(Integer.valueOf(c) >= 49 && Integer.valueOf(c) <= 57) {
+      //set input text
+      In.setText(String.valueOf(c));
+    }
+    //if pressed number 0
+    else if(Integer.valueOf(c) == 48) {
+      //clear input text
+      In.setText("");
+    }
+    //consume the key
+    key.consume();
+  }
+
+  @Override
+  public void keyPressed(KeyEvent key) {
+    //do nothing
+  }
+
+  @Override
+  public void keyReleased(KeyEvent key) {
+    //do nothing
   }
 }
