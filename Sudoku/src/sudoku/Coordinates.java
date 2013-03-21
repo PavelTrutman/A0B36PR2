@@ -3,8 +3,8 @@ package Sudoku;
 /**
  * Contains coordinates of items in sudoku.
  *
- * <p>This class enables saving of coordinates of item in sudoku. It may
- * contains only valit combinations, i.e. numbers 0-8.</p>
+ * <p>This class enables saving coordinates of items in sudoku. It may
+ * contains only valid combinations, i.e. numbers 0-8.</p>
  *
  * @author Pavel Trutman
  */
