@@ -59,14 +59,14 @@ public class GUI extends JFrame implements KeyListener {
   private int[] bigGridSize = {120, 120, 120};
   private int[] smallGridSize = {37, 37, 37};
 
-  int i, j;
-
 
   /**
    * Inits GUI.
    */
   public GUI (Sudoku sudoku){
     super("Sudoku");
+
+    int i, j;
 
     //set sudoku
     this.sudoku = sudoku;
@@ -190,6 +190,9 @@ public class GUI extends JFrame implements KeyListener {
       }
     }
 
+    //load values from object
+    this.setFromSudoku();
+
 
     //disable
     //inputs[5][6].setEditable(false);
@@ -202,7 +205,29 @@ public class GUI extends JFrame implements KeyListener {
   }
 
   private void setFromSudoku() {
+    for (int i = 0; i < 9; i++) {
+      for (int j = 0; j < 9; j++) {
+        this.inputs[i][j].setFromValue(this.sudoku.getValue(new Coordinates(i, j)));
+      }
+    }
+  }
 
+
+  private void revalidateInputs() {
+    for(int i = 0; i < 9; i++) {
+      for(int j = 0; j < 9; j++) {
+        Coordinates crd;
+        Value val;
+        crd = new Coordinates(i, j);
+        if(!this.inputs[i][j].getText().equals("") && !this.inputs[i][j].getIsValid()) {
+          val = new Value(Integer.parseInt(this.inputs[i][j].getText()), false);
+          if(this.sudoku.checkValue(crd, val) == null) {
+            this.sudoku.insert(crd, val);
+            this.inputs[i][j].setValid(true);
+          }
+        }
+      }
+    }
   }
 
 
@@ -213,23 +238,39 @@ public class GUI extends JFrame implements KeyListener {
   @Override
   public void keyTyped(KeyEvent key) {
     //get the focused component
-    JTextField In = (JTextField) this.getMostRecentFocusOwner();
-    //clear input if Ctrl+v pressed
-    if(key.isControlDown()) {
-      In.setText("");
-    }
+    TextField In = (TextField) this.getMostRecentFocusOwner();
+
     //get char from pressed key
     char c = key.getKeyChar();
-    //only numbers 1-9
-    if(Integer.valueOf(c) >= 49 && Integer.valueOf(c) <= 57) {
-      //set input text
-      In.setText(String.valueOf(c));
+
+    //clear input if Ctrl+v pressed
+    if(key.isControlDown()) {
+      c = '0';
     }
-    //if pressed number 0
-    else if(Integer.valueOf(c) == 48) {
-      //clear input text
-      In.setText("");
+
+    //only if is editable
+    if(In.isEditable()) {
+      //only numbers 1-9
+      if(Integer.valueOf(c) >= 49 && Integer.valueOf(c) <= 57) {
+        //set input text
+        In.setText(String.valueOf(c));
+        //insert into object
+        this.sudoku.getValue(In.getCoordinates()).clear();
+        In.setValid(this.sudoku.insert(In.getCoordinates(), new Value(Integer.parseInt(String.valueOf(c)), false)));
+      }
+      //if pressed number 0
+      else if(Integer.valueOf(c) == 48) {
+        //clear input text
+        In.setText("");
+        //clear from object
+        this.sudoku.getValue(In.getCoordinates()).clear();
+        In.setValid(true);
+      }
     }
+
+    //revalidate all invalid values
+    this.revalidateInputs();
+
     //consume the key
     key.consume();
   }
