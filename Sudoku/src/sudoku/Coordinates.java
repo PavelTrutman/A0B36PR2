@@ -1,4 +1,4 @@
-package Sudoku;
+package sudoku;
 
 /**
  * Contains coordinates of items in sudoku.

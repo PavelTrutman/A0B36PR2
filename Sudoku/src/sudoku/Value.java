@@ -1,4 +1,4 @@
-package Sudoku;
+package sudoku;
 
 /**
  * This class enables saving values in each field in sudoku.
@@ -9,7 +9,7 @@ package Sudoku;
  */
 public class Value {
   /**
-   * saved value
+   * Saved value
    */
   private int value;
 

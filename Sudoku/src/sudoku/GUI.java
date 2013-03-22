@@ -14,44 +14,62 @@ import javax.swing.border.*;
  */
 public class GUI extends JFrame implements KeyListener {
 
+  /*
+   * Sudoku
+   */
+  private Sudoku sudoku;
+
+  /**
+   * Components
+   */
+  private Container container;
+  private GridBagLayout bigGrid;
+  private GridBagLayout smallGrid;
+  private GridBagConstraints bigGridCon;
+  private GridBagConstraints smallGridCon;
+  private TextField[][] inputs;
+  private JPanel[][] bigSquares;
+  private JPanel sud;
+
+  /*
+   * Menu items
+   */
+  private JMenuBar menuBar;
+  private JMenu gameMenu;
+  private JMenuItem exitGame;
+  private JMenuItem newGame;
+  private JMenuItem restartGame;
+  private JMenuItem nextMoveGame;
+  private JMenuItem solveGame;
+  private JMenuItem saveGame;
+  private JMenuItem loadGame;
+  private JMenu aboutMenu;
+  private JMenuItem gameAbout;
+  private JMenuItem authorAbout;
+
+  /*
+   * Dimension and border
+   */
+  private Dimension Dim;
+  private Border bord;
+
+  /*
+   * Grid sizes
+   */
+  private int[] bigGridSize = {120, 120, 120};
+  private int[] smallGridSize = {37, 37, 37};
+
+  int i, j;
+
+
   /**
    * Inits GUI.
    */
-  public GUI (){
+  public GUI (Sudoku sudoku){
     super("Sudoku");
 
-    /**
-     * Components
-     */
-    Container container;
-    GridBagLayout bigGrid;
-    GridBagLayout smallGrid;
-    GridBagConstraints bigGridCon;
-    GridBagConstraints smallGridCon;
-    JTextField[][] inputs;
-    JPanel[][] bigSquares;
-    JPanel sud;
-
-    /*
-     * Menu items
-     */
-    JMenuBar menuBar;
-    JMenu gameMenu;
-    JMenuItem exitGame;
-    JMenuItem newGame;
-    JMenuItem restartGame;
-    JMenuItem nextMoveGame;
-    JMenuItem solveGame;
-    JMenuItem saveGame;
-    JMenuItem loadGame;
-    JMenu aboutMenu;
-    JMenuItem gameAbout;
-    JMenuItem authorAbout;
-
-    Dimension Dim;
-    Border bord;
-
-    int i, j;
+    //set sudoku
+    this.sudoku = sudoku;
 
     //set border
     bord = new LineBorder(Color.BLACK, 1, false);
@@ -122,8 +140,6 @@ public class GUI extends JFrame implements KeyListener {
 
 
     //GRID 3x3 INIT
-    //size of grids
-    int[] bigGridSize = {120, 120, 120};
     bigGrid = new GridBagLayout();
     bigGrid.columnWidths = bigGridSize;
     bigGrid.rowHeights = bigGridSize;
@@ -131,8 +147,6 @@ public class GUI extends JFrame implements KeyListener {
     bigGridCon.fill = GridBagConstraints.BOTH;
 
     //GRID 9x9 INIT
-    //size of grids
-    int[] smallGridSize = {37, 37, 37};
     smallGrid = new GridBagLayout();
     smallGrid.columnWidths = smallGridSize;
     smallGrid.rowHeights = smallGridSize;
@@ -164,35 +178,33 @@ public class GUI extends JFrame implements KeyListener {
     }
 
     //GRID 9x9 GENERATE
-    inputs = new JTextField[9][9];
+    inputs = new TextField[9][9];
     for(i = 0; i < 9; i++) {
       for(j = 0; j < 9; j++) {
         smallGridCon.gridx = i%3;
         smallGridCon.gridy = j%3;
-        inputs[i][j] = new JTextField();
-        inputs[i][j].setColumns(1);
-        inputs[i][j].setFont(new java.awt.Font("Verdana", 1, 20));
-        inputs[i][j].setBorder(null);
-        inputs[i][j].setHorizontalAlignment(JTextField.CENTER);
-        inputs[i][j].setBackground(new Color(250, 250, 250));
+        inputs[i][j] = new TextField(new Coordinates(i, j));
         inputs[i][j].addKeyListener(this);
         bigSquares[i/3][j/3].add(inputs[i][j], smallGridCon);
 
       }
     }
 
-    /*
+
     //disable
-    inputs[5][6].setEditable(false);
-    inputs[5][6].setText("6");
-    inputs[5][6].setBackground(new Color(238, 238, 238));
-    */
+    //inputs[5][6].setEditable(false);
+    //inputs[5][6].setText("6");
 
     //SET IT VISIBLE AND PACK IT
     this.setVisible(true);
     pack();
 
   }
+
+  private void setFromSudoku() {
+
+  }
+
 
   /**
    * Iplementing KeyListener methods.
