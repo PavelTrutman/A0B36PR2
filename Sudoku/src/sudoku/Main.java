@@ -13,11 +13,11 @@ public class Main {
     GUI window;
     Sudoku sudoku;
 
-    sudoku = new Sudoku();
+    sudoku = Sudoku.generateFullGrid();
 
     //insert some testing values
-    sudoku.insert(new Coordinates(1, 1), new Value(3, false));
-    sudoku.insert(new Coordinates(5, 3), new Value(9, true));
+    //sudoku.insert(new Coordinates(1, 1), new Value(3, false));
+    //sudoku.insert(new Coordinates(5, 3), new Value(9, true));
 
     window = new GUI(sudoku);
 

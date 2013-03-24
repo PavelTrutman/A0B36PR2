@@ -253,4 +253,51 @@ public class Sudoku {
     //pokud jsme žádné prázdné políčko nenašli, vracíme TRUE
     return true;
   }
+
+
+  public static Sudoku generateFullGrid() {
+    Sudoku sudoku;
+    sudoku = new Sudoku();
+    boolean numbers[][];
+    numbers = new boolean[81][9];
+    int square = 0;
+    boolean outOfNumbers;
+    int i = 0;
+
+    while(square < 81 && square >= 0) {
+      sudoku.getValue(new Coordinates(square%9, square/9)).clear();
+
+      //are we out of numbers?
+      outOfNumbers = true;
+      for(i = 0; i < 9; i++) {
+        //System.out.println(square + " " + i);
+        outOfNumbers &= numbers[square][i];
+      }
+      if(outOfNumbers) {
+        //no numbers left
+        for(i = 0; i < 9; i++) {
+          numbers[square][i] = false;
+        }
+        //back one square
+        sudoku.getValue(new Coordinates(square%9, square/9)).clear();
+        square--;
+        continue;
+      }
+      else {
+        //get random unused number
+        int num = (int) Math.round(Math.random()*8);
+        while(numbers[square][num]) {
+          num = (num + 1) % 9;
+        }
+        numbers[square][num] = true;
+        //check if conflict
+        if(sudoku.insert(new Coordinates(square%9, square/9), new Value(num + 1, false))) {
+          square++;
+        }
+      }
+    }
+
+    return sudoku;
+  }
+
 }
