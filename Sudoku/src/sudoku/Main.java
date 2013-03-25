@@ -13,7 +13,7 @@ public class Main {
     GUI window;
     Sudoku sudoku;
 
-    sudoku = Sudoku.generateFullGrid();
+    sudoku = Sudoku.generatePuzzle();
 
     //insert some testing values
     //sudoku.insert(new Coordinates(1, 1), new Value(3, false));

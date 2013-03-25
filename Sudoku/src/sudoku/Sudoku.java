@@ -236,56 +236,88 @@ public class Sudoku {
     return false;
   }
 
-  public void solve() {
+  public boolean solve(boolean clc) {
     LinkedList<Coordinates> list;
     list = new LinkedList();
     Coordinates crd;
     int n;
+    boolean ret = false;
+    boolean inserted;
 
     //find all empty values
     for (int i = 0; i < 9; i++) {
       for (int j = 0; j < 9; j++) {
-        if(this.sudoku[i][j].getIsEmpty()) {
-          list.addLast(new Coordinates(i, j));
+        crd = new Coordinates(i, j);
+        if(this.getValue(crd).getIsEmpty()) {
+          list.add(crd);
         }
       }
     }
 
     //iterate over empty values
-    ListIterator<Coordinates> it = list.listIterator();
-    if(it.hasNext()) {
+    int s = list.size();
+    int is = -1;
+    if((is + 1) < s) {
       //take the first one
-      crd = it.next();
+      is++;
+      crd = list.get(is);
       while(true) {
         n = 0;
         //get value on the position
         if(!this.getValue(crd).getIsEmpty()) {
           n = this.getValue(crd).getValue();
         }
-        //clear the position
-        this.getValue(crd).clear();
+
         //try to insert all values
-        do {
-          n++;
+        inserted = false;
+        for(int i = n + 1; i <= 9; i++) {
+          this.getValue(crd).clear();
+          if(this.insert(crd, new Value(i, false))) {
+            inserted = true;
+            break;
+          }
         }
-        while((n != 10) && !this.insert(crd, new Value(n, false)));
 
         //backtrack if all values tried
-        if(n == 10) {
-          crd = it.previous();
+        if(!inserted) {
+          this.getValue(crd).clear();
+          //take previous empty square
+          if((is - 1) >= 0) {
+            is--;
+            crd = list.get(is);
+            continue;
+          }
+          else {
+            //solution not found
+            ret = false;
+            break;
+          }
         }
         //take next empty position if exists
         else {
-          if(it.hasNext()) {
-            crd = it.next();
+          if((is + 1) < s) {
+            is++;
+            crd = list.get(is);
+            continue;
           }
           else {
             //we filled all positions
+            ret = true;
             break;
           }
         }
       }
     }
+
+    //clear filled values if needed
+    if(clc) {
+      for(is = 0; is < s; is++) {
+        crd = list.get(is);
+        this.getValue(crd).clear();
+      }
+    }
+
+    return ret;
   }
 
 
@@ -317,7 +349,7 @@ public class Sudoku {
     numbers = new boolean[81][9];
     int square = 0;
     boolean outOfNumbers;
-    int i = 0;
+    int i;
 
     while(square < 81 && square >= 0) {
       sudoku.getValue(new Coordinates(square%9, square/9)).clear();
@@ -352,6 +384,65 @@ public class Sudoku {
       }
     }
 
+    return sudoku;
+  }
+
+  public static Sudoku generatePuzzle() {
+    Sudoku sudoku;
+    sudoku = Sudoku.generateFullGrid();
+
+    Coordinates crd;
+    int x, y;
+    int i = 1;
+    int v;
+    boolean moreSolutions;
+
+    //loop until wanted numbers removed
+    while(i <= 46) {
+      //get random coordinates
+      x = (int) Math.round(Math.random()*8);
+      y = (int) Math.round(Math.random()*8);
+      crd = new Coordinates(x, y);
+
+      //take another one if empty
+      if(sudoku.getValue(crd).getIsEmpty()) {
+        continue;
+      }
+
+      //remove value and try remaining values
+      v = sudoku.getValue(crd).getValue();
+      sudoku.getValue(crd).clear();
+      moreSolutions = false;
+      for(int j = 1; j <= 9; j++) {
+        if(j != v) {
+          if(sudoku.insert(crd, new Value(j, false))) {
+            //chech if exists more solutions
+            if(sudoku.solve(true)) {
+              moreSolutions = true;
+              sudoku.getValue(crd).clear();
+              break;
+            }
+            sudoku.getValue(crd).clear();
+          }
+        }
+      }
+      if(moreSolutions) {
+        //insert value back and try another one
+        sudoku.insert(crd, new Value(v, false));
+      }
+      else {
+        i++;
+      }
+    }
+
+    //set all used squares as persistent
+    for(i = 0; i < 9; i++) {
+      for(int j = 0; j < 9; j++) {
+        if(!sudoku.getValue(new Coordinates(i, j)).getIsEmpty()) {
+          sudoku.getValue(new Coordinates(i, j)).setPersistent();
+        }
+      }
+    }
     return sudoku;
   }
 

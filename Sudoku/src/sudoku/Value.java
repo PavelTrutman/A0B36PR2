@@ -176,7 +176,7 @@ public class Value {
    */
   public boolean compareValue(Value second) {
     //must be filled
-    if(!this.getIsEmpty() & !second.getIsEmpty()) {
+    if(!this.getIsEmpty() && !second.getIsEmpty()) {
       //must have the same value
       if(this.getValue() == second.getValue()) {
         //if equals, return TRUE
