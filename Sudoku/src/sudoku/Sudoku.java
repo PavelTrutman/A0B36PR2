@@ -1,5 +1,7 @@
 package sudoku;
 
+import java.util.*;
+
 /**
  * Objekt této třídy obsahuje rozehranou hru a umožňuje interakci s ní.
  *
@@ -233,6 +235,59 @@ public class Sudoku {
     //pokud se nepovedlo vložit, vrátíme FALSE
     return false;
   }
+
+  public void solve() {
+    LinkedList<Coordinates> list;
+    list = new LinkedList();
+    Coordinates crd;
+    int n;
+
+    //find all empty values
+    for (int i = 0; i < 9; i++) {
+      for (int j = 0; j < 9; j++) {
+        if(this.sudoku[i][j].getIsEmpty()) {
+          list.addLast(new Coordinates(i, j));
+        }
+      }
+    }
+
+    //iterate over empty values
+    ListIterator<Coordinates> it = list.listIterator();
+    if(it.hasNext()) {
+      //take the first one
+      crd = it.next();
+      while(true) {
+        n = 0;
+        //get value on the position
+        if(!this.getValue(crd).getIsEmpty()) {
+          n = this.getValue(crd).getValue();
+        }
+        //clear the position
+        this.getValue(crd).clear();
+        //try to insert all values
+        do {
+          n++;
+        }
+        while((n != 10) && !this.insert(crd, new Value(n, false)));
+
+        //backtrack if all values tried
+        if(n == 10) {
+          crd = it.previous();
+        }
+        //take next empty position if exists
+        else {
+          if(it.hasNext()) {
+            crd = it.next();
+          }
+          else {
+            //we filled all positions
+            break;
+          }
+        }
+      }
+    }
+  }
+
 
   /**
    * Zkontroluje, zda jsou již všechna políčka v sudoku vyplněná.
