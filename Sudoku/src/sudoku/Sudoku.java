@@ -1,5 +1,6 @@
 package sudoku;
 
+import java.io.*;
 import java.util.*;
 
 /**
@@ -10,7 +11,7 @@ import java.util.*;
  *
  * @author Pavel Trutman
  */
-public class Sudoku {
+public class Sudoku implements Serializable {
   /**
    * pole s hodnotami v sudoku
    */
@@ -145,68 +146,6 @@ public class Sudoku {
   }
 
   /**
-   * Zkusí najít další možný tah v sudoku.
-   *
-   * <p>Tato metoda projde všechny volné pole v sudoku a zjistí jaké možné
-   * hodnoty je tam možné umístit, tak aby neodporovaly pravidlům. Pokud je
-   * možná pouze jedna hodnota pro vložení, je to další jistý tah, který může
-   * být proveden a je nabídnut hráči.</p>
-   *
-   * @return objekt Ret se souřadnicemi a hodnotou možného dalšího tahu, pokud
-   * algoritmus nenašel další možný tah, tak vrátí tento objekt v chybovém stavu
-   *//*
-  public Ret hint() {
-    int x;
-    int y;
-    int value;
-    int count;
-    Ret result;
-
-    //pole boolean odpovídající hotnotám 1-9, je-li TRUE lze tam hodnota vložit,
-    //je-li FALSE nelze ji tam vložit
-    boolean[] posibilities;
-    posibilities = new boolean[9];
-
-    //procházíme celé sudoku
-    for(x = 0; x < 9; x++) {
-      for(y = 0; y < 9; y++) {
-        //pouze políčka, která nejsou obsazená
-        if(this.sudoku[x][y].getIsEmpty()) {
-          count = 0;      //počítadlo, kolik možných hodnot je možné vložit na toto políčko
-          //zkusíme vložit každou hodnotu
-          for(value = 0; value < 9; value++) {
-            result = checkValue(new Coordinates(x, y), new Value(value + 1, false));
-            //lze-li ji tam vložit
-            if(!result.getIsOK()) {
-              //uložíme si, že právě tato hodnota tam lze vložit
-              posibilities[value] = true;
-              //zvýšíme počítadlo hodnot
-              count++;
-            }
-            //nelze hodnotu vložit
-            else {
-              //uložíme, že ji vložit nelze
-              posibilities[value] = false;
-            }
-          }
-          //pokud lze na toto políčko vložit právě jedna hodnota
-          if (count == 1) {
-            //projdeme pole hodnot a zjistíme, která to byla
-            for(value = 0; value < 9; value++) {
-              if(posibilities[value]) {
-                //vrátíme ji
-                return new Ret(x, y, (value + 1));
-              }
-            }
-          }
-        }
-      }
-    }
-    //pokud jsme nic našli, vrátíme Ret v chybovém stavu
-    return new Ret(false);
-  }*/
-
-  /**
    * Na konkrétní souřadnice v sudoku vloží danou hodnotu.
    *
    * <p>Ověří, zda je možné na políčko s danými souřadnicemi hodnotu vložit, a
@@ -318,6 +257,24 @@ public class Sudoku {
     }
 
     return ret;
+  }
+
+  public Coordinates hint() {
+    Sudoku solved;
+    Coordinates crd;
+    solved = this.copy();
+    if(solved.solve(false)) {
+      for(int i = 0; i < 9; i++) {
+        for(int j = 0; j < 9; j++) {
+          if(this.getValue(new Coordinates(i, j)).getIsEmpty()) {
+            crd = new Coordinates(i, j);
+            this.insert(crd, solved.getValue(crd));
+            return crd;
+          }
+        }
+      }
+    }
+    return null;
   }
 
 
@@ -444,6 +401,64 @@ public class Sudoku {
       }
     }
     return sudoku;
+  }
+
+  public Sudoku copy() {
+    Sudoku cp;
+    cp = new Sudoku();
+    Coordinates crd;
+    for(int i = 0; i < 9; i++) {
+      for(int j = 0; j < 9; j++) {
+        crd = new Coordinates(i, j);
+        cp.getValue(crd).setValue(this.getValue(crd));
+      }
+    }
+    return cp;
+  }
+
+  public boolean writeToFile(String path) {
+    ObjectOutputStream oos = null;
+    try {
+      oos = new ObjectOutputStream(new FileOutputStream(path));
+      oos.writeObject(this);
+    }
+    catch (IOException e) {
+      return false;
+    }
+    finally {
+      try {
+        if(oos != null) {
+          oos.close();
+        }
+      }
+      catch(IOException ex) {
+        //do nothing, all sources are closed
+      }
+    }
+    return true;
+  }
+
+  public static Sudoku readFromFile(String path) {
+    ObjectInputStream ois = null;
+    Sudoku s;
+    try {
+      ois = new ObjectInputStream(new FileInputStream(path));
+      s = (Sudoku) ois.readObject();
+    }
+    catch (IOException | ClassNotFoundException e) {
+      return null;
+    }
+    finally {
+      try {
+        if(ois != null) {
+          ois.close();
+        }
+      }
+      catch(IOException ex) {
+        //do nothing, all sources are closed
+      }
+    }
+    return s;
   }
 
 }

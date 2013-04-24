@@ -1,6 +1,8 @@
 package sudoku;
 
 import java.awt.*;
+import java.io.*;
+import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -35,16 +37,21 @@ public class GUI extends JFrame {
    */
   private JMenuBar menuBar;
   private JMenu gameMenu;
-  private JMenuItem exitGame;
-  private JMenuItem newGame;
-  private JMenuItem restartGame;
-  private JMenuItem nextMoveGame;
-  private JMenuItem solveGame;
-  private JMenuItem saveGame;
-  private JMenuItem loadGame;
+  public MenuItem newGame;
+  public MenuItem restartGame;
+  public MenuItem nextMoveGame;
+  public MenuItem solveGame;
+  public MenuItem saveGame;
+  public MenuItem loadGame;
+  public MenuItem exitGame;
   private JMenu aboutMenu;
-  private JMenuItem gameAbout;
-  private JMenuItem authorAbout;
+  public MenuItem gameAbout;
+  public MenuItem authorAbout;
+
+  /*
+   * File choosers
+   */
+  private JFileChooser fileChooser;
 
   /*
    * Dimension and border
@@ -82,6 +89,17 @@ public class GUI extends JFrame {
     this.setResizable(false);
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+    //set icon
+    try {
+      this.setIconImage(ImageIO.read(new File(".\\src\\sudoku\\images\\ico.png")));
+    }
+    catch(IOException ex) {
+      System.out.println("When reading icon file: " + ex.getMessage());
+    }
+
+    //INIT FILE CHOOSER DIALOG
+    fileChooser = new JFileChooser();
+
     //MENUS
     menuBar = new JMenuBar();
 
@@ -90,36 +108,29 @@ public class GUI extends JFrame {
     gameMenu.setText("Game");
     menuBar.add(gameMenu);
 
-    newGame = new JMenuItem();
-    newGame.setText("New");
+    newGame = new MenuItem(this, "New");
     gameMenu.add(newGame);
 
-    restartGame = new JMenuItem();
-    restartGame.setText("Restart");
+    restartGame = new MenuItem(this, "Restart");
     gameMenu.add(restartGame);
 
-    nextMoveGame = new JMenuItem();
-    nextMoveGame.setText("Next move");
+    nextMoveGame = new MenuItem(this, "Next move");
     gameMenu.add(nextMoveGame);
 
-    solveGame = new JMenuItem();
-    solveGame.setText("Solve");
+    solveGame = new MenuItem(this, "Solve");
     gameMenu.add(solveGame);
 
     gameMenu.addSeparator();
 
-    saveGame = new JMenuItem();
-    saveGame.setText("Save");
+    saveGame = new MenuItem(this, "Save");
     gameMenu.add(saveGame);
 
-    loadGame = new JMenuItem();
-    loadGame.setText("Load");
+    loadGame = new MenuItem(this, "Load");
     gameMenu.add(loadGame);
 
     gameMenu.addSeparator();
 
-    exitGame = new JMenuItem();
-    exitGame.setText("Exit");
+    exitGame = new MenuItem(this, "Exit");
     gameMenu.add(exitGame);
 
     //about menu
@@ -127,12 +138,10 @@ public class GUI extends JFrame {
     aboutMenu.setText("About");
     menuBar.add(aboutMenu);
 
-    gameAbout = new JMenuItem();
-    gameAbout.setText("About game");
+    gameAbout = new MenuItem(this, "About game");
     aboutMenu.add(gameAbout);
 
-    authorAbout = new JMenuItem();
-    authorAbout.setText("About auhtor");
+    authorAbout = new MenuItem(this, "About author");
     aboutMenu.add(authorAbout);
 
     setJMenuBar(menuBar);
@@ -202,14 +211,55 @@ public class GUI extends JFrame {
     return sudoku;
   }
 
+  public void setSudoku(Sudoku sudoku) {
+    this.sudoku = sudoku;
+    this.setFromSudoku();
+  }
+
   private void setFromSudoku() {
-    for (int i = 0; i < 9; i++) {
-      for (int j = 0; j < 9; j++) {
+    for(int i = 0; i < 9; i++) {
+      for(int j = 0; j < 9; j++) {
+        this.inputs[i][j].clear();
         this.inputs[i][j].setFromValue(this.sudoku.getValue(new Coordinates(i, j)));
       }
     }
   }
 
+  public void restart() {
+    for(int i = 0; i < 9; i++) {
+      for(int j = 0; j < 9; j++) {
+        if(this.inputs[i][j].isEditable()) {
+          this.inputs[i][j].clear();
+          this.sudoku.getValue(new Coordinates(i, j)).clear();
+        }
+      }
+    }
+  }
+
+  public void hint() {
+    Coordinates crd;
+    Value val;
+    crd = this.sudoku.hint();
+    if(crd != null) {
+      val = this.sudoku.getValue(crd);
+      this.inputs[crd.getX()][crd.getY()].clear();
+      this.inputs[crd.getX()][crd.getY()].setFromValue(val);
+      this.inputs[crd.getX()][crd.getY()].setGreen();
+      this.revalidateInputs();
+    }
+    else {
+      JOptionPane.showMessageDialog(null, "Sudoku has no solution now. Try to remove some numbers.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+  }
+
+  public void solve() {
+    if(this.sudoku.solve(false)) {
+      this.setSudoku(sudoku);
+    }
+    else {
+      JOptionPane.showMessageDialog(null, "Sudoku has no solution now. Try to remove some numbers.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+  }
 
   public void revalidateInputs() {
     for(int i = 0; i < 9; i++) {
@@ -226,6 +276,41 @@ public class GUI extends JFrame {
         }
       }
     }
+  }
+
+  public void save() {
+    int ret;
+    fileChooser.setApproveButtonText("Save");
+    fileChooser.setDialogTitle("Save");
+    ret = fileChooser.showOpenDialog(this);
+     if (ret == JFileChooser.APPROVE_OPTION) {
+       File file = fileChooser.getSelectedFile();
+       if(this.sudoku.writeToFile(file.getAbsolutePath())) {
+         JOptionPane.showMessageDialog(null, "Sudoku was successfuly saved.", "Game saved", JOptionPane.INFORMATION_MESSAGE);
+       }
+       else {
+         JOptionPane.showMessageDialog(null, "Error when saving game. Not saved!", "Error", JOptionPane.ERROR_MESSAGE);
+       }
+     }
+  }
+
+  public void load() {
+    fileChooser.setApproveButtonText("Load");
+    fileChooser.setDialogTitle("Load");
+    int ret;
+    Sudoku s;
+    ret = fileChooser.showOpenDialog(this);
+     if (ret == JFileChooser.APPROVE_OPTION) {
+       File file = fileChooser.getSelectedFile();
+       s = Sudoku.readFromFile(file.getAbsolutePath());
+       if(s != null) {
+         this.setSudoku(s);
+         //JOptionPane.showMessageDialog(null, "Sudoku was successfuly saved.", "Game saved", JOptionPane.INFORMATION_MESSAGE);
+       }
+       else {
+         JOptionPane.showMessageDialog(null, "Error when loading file.", "Error", JOptionPane.ERROR_MESSAGE);
+       }
+     }
   }
 
 }

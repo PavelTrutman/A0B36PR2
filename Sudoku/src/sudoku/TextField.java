@@ -2,6 +2,8 @@ package sudoku;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 
 /**
@@ -32,6 +34,7 @@ public class TextField extends JTextField implements KeyListener {
   private Color BGNonEditable = new Color(238, 238, 238);
   private Color FGInvalid = new Color(210, 30, 30);
   private Color FGValid = new Color(50, 50, 50);
+  private Color FGGreen = new Color(30, 130, 30);
 
   public TextField(Coordinates crd, GUI gui) {
     this.crd = crd;
@@ -89,6 +92,10 @@ public class TextField extends JTextField implements KeyListener {
 
   public boolean getIsValid() {
     return this.isValid;
+  }
+
+  public void setGreen() {
+    this.setForeground(FGGreen);
   }
 
   @Override

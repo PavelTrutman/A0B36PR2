@@ -1,5 +1,7 @@
 package sudoku;
 
+import java.io.Serializable;
+
 /**
  * This class enables saving values in each field in sudoku.
  *
@@ -7,7 +9,7 @@ package sudoku;
  *
  * @author Pavel Trutman
  */
-public class Value {
+public class Value implements Serializable{
   /**
    * Saved value
    */
