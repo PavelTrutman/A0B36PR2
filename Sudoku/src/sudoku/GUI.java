@@ -9,7 +9,10 @@ import javax.swing.border.*;
 /**
  * Graphical user interface.
  *
- * <p>Creates a graphical user interface to interact with user.</p>
+ * <p>Creates a graphical user interface to interact with user. It enables
+ * adding, removing and changing values in sudoku. Also contains menu with
+ * buttons to create new game, restart game, save or load game from file.
+ * There are buttons to solve or help with next move, too.</p>
  *
  * @author Pavel Trutman
  */
@@ -68,6 +71,7 @@ public class GUI extends JFrame {
 
   /**
    * Inits GUI.
+   * @param sudoku create game from this
    */
   public GUI (Sudoku sudoku){
     super("Sudoku");
@@ -192,7 +196,6 @@ public class GUI extends JFrame {
         smallGridCon.gridx = i%3;
         smallGridCon.gridy = j%3;
         inputs[i][j] = new TextField(new Coordinates(i, j), this);
-        //inputs[i][j].addKeyListener(this);
         bigSquares[i/3][j/3].add(inputs[i][j], smallGridCon);
 
       }
@@ -207,28 +210,46 @@ public class GUI extends JFrame {
 
   }
 
+  /**
+   * Returns loaded sudoku.
+   *
+   * @return sudoku loaded in GUI
+   */
   public Sudoku getSudoku() {
     return sudoku;
   }
 
+  /**
+   * Sets sudoku to display.
+   *
+   * @param sudoku sudoku to display in GUI
+   */
   public void setSudoku(Sudoku sudoku) {
     this.sudoku = sudoku;
     this.setFromSudoku();
   }
 
+  /**
+   * Updates all information in GUI from loaded sudoku.
+   */
   private void setFromSudoku() {
     for(int i = 0; i < 9; i++) {
       for(int j = 0; j < 9; j++) {
+        //clear it and set to right value
         this.inputs[i][j].clear();
         this.inputs[i][j].setFromValue(this.sudoku.getValue(new Coordinates(i, j)));
       }
     }
   }
 
+  /**
+   * Restarts the current game.
+   */
   public void restart() {
     for(int i = 0; i < 9; i++) {
       for(int j = 0; j < 9; j++) {
         if(this.inputs[i][j].isEditable()) {
+          //if the value is not persistent, set it empty.
           this.inputs[i][j].clear();
           this.sudoku.getValue(new Coordinates(i, j)).clear();
         }
@@ -236,11 +257,19 @@ public class GUI extends JFrame {
     }
   }
 
+  /**
+   * Shows hint.
+   *
+   * If it has no suitable solution shows warning.
+   */
   public void hint() {
     Coordinates crd;
     Value val;
+    //try to solve it
     crd = this.sudoku.hint();
+    //if the solution exists
     if(crd != null) {
+      //set the input to right valeu
       val = this.sudoku.getValue(crd);
       this.inputs[crd.getX()][crd.getY()].clear();
       this.inputs[crd.getX()][crd.getY()].setFromValue(val);
@@ -248,28 +277,43 @@ public class GUI extends JFrame {
       this.revalidateInputs();
     }
     else {
+      //else show warning
       JOptionPane.showMessageDialog(null, "Sudoku has no solution now. Try to remove some numbers.", "Error", JOptionPane.ERROR_MESSAGE);
     }
   }
 
+  /**
+   * Tries to solve the loaded sudoku.
+   *
+   * If sudoku has any suitable solution shows warning.
+   */
   public void solve() {
+    //try to solve it
     if(this.sudoku.solve(false)) {
+      //if it has solution, set it to GUI
       this.setSudoku(sudoku);
     }
     else {
+      //else show warning
       JOptionPane.showMessageDialog(null, "Sudoku has no solution now. Try to remove some numbers.", "Error", JOptionPane.ERROR_MESSAGE);
     }
   }
 
+  /**
+   * Checks all inputs, if the color of them is right.
+   */
   public void revalidateInputs() {
+    //go throught all values
     for(int i = 0; i < 9; i++) {
       for(int j = 0; j < 9; j++) {
         Coordinates crd;
         Value val;
         crd = new Coordinates(i, j);
         if(!this.inputs[i][j].getText().equals("") && !this.inputs[i][j].getIsValid()) {
+          //if is red, check if is still invalid
           val = new Value(Integer.parseInt(this.inputs[i][j].getText()), false);
           if(this.sudoku.checkValue(crd, val) == null) {
+            //if is no longer invalid, set it
             this.sudoku.insert(crd, val);
             this.inputs[i][j].setValid(true);
           }
@@ -278,23 +322,34 @@ public class GUI extends JFrame {
     }
   }
 
+  /**
+   * Saves current state of game into file.
+   */
   public void save() {
     int ret;
+    //init file chooser
     fileChooser.setApproveButtonText("Save");
     fileChooser.setDialogTitle("Save");
     ret = fileChooser.showOpenDialog(this);
      if (ret == JFileChooser.APPROVE_OPTION) {
        File file = fileChooser.getSelectedFile();
+       //try to save it
        if(this.sudoku.writeToFile(file.getAbsolutePath())) {
+         //success, show info
          JOptionPane.showMessageDialog(null, "Sudoku was successfuly saved.", "Game saved", JOptionPane.INFORMATION_MESSAGE);
        }
        else {
+         //failed, show warning
          JOptionPane.showMessageDialog(null, "Error when saving game. Not saved!", "Error", JOptionPane.ERROR_MESSAGE);
        }
      }
   }
 
+  /**
+   * Loads game from file.
+   */
   public void load() {
+    //init file chooser
     fileChooser.setApproveButtonText("Load");
     fileChooser.setDialogTitle("Load");
     int ret;
@@ -303,11 +358,13 @@ public class GUI extends JFrame {
      if (ret == JFileChooser.APPROVE_OPTION) {
        File file = fileChooser.getSelectedFile();
        s = Sudoku.readFromFile(file.getAbsolutePath());
+       //try to read the file
        if(s != null) {
+         //success, try to set it to GUI
          this.setSudoku(s);
-         //JOptionPane.showMessageDialog(null, "Sudoku was successfuly saved.", "Game saved", JOptionPane.INFORMATION_MESSAGE);
        }
        else {
+         //failed loading, show warning
          JOptionPane.showMessageDialog(null, "Error when loading file.", "Error", JOptionPane.ERROR_MESSAGE);
        }
      }

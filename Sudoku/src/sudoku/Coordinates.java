@@ -27,7 +27,7 @@ public class Coordinates {
   }
 
   /**
-   * Return X-axis coordinate.
+   * Returns X-axis coordinate.
    *
    * @return X-axis coordinate
    */
@@ -36,7 +36,7 @@ public class Coordinates {
   }
 
   /**
-   * Vrací Y-axis coordinate.
+   * Returns Y-axis coordinate.
    *
    * @return Y-axis coordinate
    */
@@ -53,12 +53,15 @@ public class Coordinates {
    */
   public void set(int x, int y) throws RuntimeException {
     //are coordinates valid?
+    //for x
     if(x >= 0 & x < 9) {
       this.x = x;
     }
     else {
       throw new RuntimeException();
     }
+
+    //for y
     if(y >= 0 & y < 9) {
       this.y = y;
     }
