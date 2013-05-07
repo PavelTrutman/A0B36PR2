@@ -194,7 +194,7 @@ public class Value implements Serializable{
    *
    * @return saved value or char '_' if is empty
    */
-  public char render() {
+  /*public char render() {
     if(this.isEmpty) {
       //if empty return '_'
       return '_';
@@ -203,5 +203,5 @@ public class Value implements Serializable{
       //else value converted to char
       return Character.forDigit(this.value, 10);
     }
-  }
+  }*/
 }

@@ -70,7 +70,7 @@ public class MenuItem extends JMenuItem implements ActionListener {
     }
     else if(menu == gui.gameAbout) {
       //show info about game
-      JOptionPane.showMessageDialog(null, "Sudoku, version 1.0\nBuilt 2013/04/04.\n\nThis game was made as semestral work at CTU.\n\nAll sources are avaible at site: https://github.com/trutmpav/A0B36PR2.\nAll contributors are welcome.", "About game", JOptionPane.PLAIN_MESSAGE);
+      JOptionPane.showMessageDialog(null, "Sudoku, version 1.0\nBuilt 2013/05/07.\n\nThis game was made as semestral work at CTU.\n\nAll sources are avaible at site: https://github.com/trutmpav/A0B36PR2.\nAll contributors are welcome.", "About game", JOptionPane.PLAIN_MESSAGE);
     }
     else if(menu == gui.authorAbout) {
       //show info about author
