@@ -188,20 +188,4 @@ public class Value implements Serializable{
     //else return FALSE
     return false;
   }
-
-  /**
-   * Returns value to be printed on the screen.
-   *
-   * @return saved value or char '_' if is empty
-   */
-  /*public char render() {
-    if(this.isEmpty) {
-      //if empty return '_'
-      return '_';
-    }
-    else {
-      //else value converted to char
-      return Character.forDigit(this.value, 10);
-    }
-  }*/
 }
